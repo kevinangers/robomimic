@@ -265,7 +265,7 @@ class EnvRobosuite(EB.EnvBase):
                 pf = robot.robot_model.naming_prefix
                 for k in di:
                     if k.startswith(pf) and (k not in ret) and \
-                            (not k.endswith("proprio-state")) and (k in ObsUtils.OBS_KEYS_TO_MODALITIES):
+                            (not k.endswith("proprio-state")):
                         ret[k] = np.array(di[k])
         else:
             # minimal proprioception for older versions of robosuite
