@@ -1,3 +1,4 @@
+from email.mime import base
 """
 This script sets up a private macros file.
 

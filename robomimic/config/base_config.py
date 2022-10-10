@@ -60,7 +60,7 @@ class BaseConfig(Config):
         self.train_config()
         self.algo_config()
         self.observation_config()
-        self.meta_config()
+        self.tag_config()
 
         # After Config init, new keys cannot be added to the config, except under nested
         # attributes that have called @do_not_lock_keys
@@ -272,18 +272,12 @@ class BaseConfig(Config):
         self.observation.encoder.scan.core_kwargs = Config()                    # See models/obs_core.py for important kwargs to set and defaults used
         self.observation.encoder.scan.core_kwargs.do_not_lock_keys()
 
-    def meta_config(self):
-        """
-        This function populates the `config.meta` attribute of the config. This portion of the config 
-        is used to specify job information primarily for hyperparameter sweeps.
-        It contains hyperparameter keys and values, which are populated automatically
-        by the hyperparameter config generator (see `utils/hyperparam_utils.py`).
-        These values are read by the wandb logger (see `utils/log_utils.py`) to set job tags.
-        """
-        
-        self.meta.hp_base_config_file = None            # base config file in hyperparam sweep
-        self.meta.hp_keys = []                          # relevant keys (swept) in hyperparam sweep
-        self.meta.hp_values = []                        # values corresponding to keys in hyperparam sweep
+    def tag_config(self):
+        self.tags.wandb_proj_name = "debug"             # project name in wandb
+        self.tags.algo = self.algo_name                 # algorithm name, eg. bc
+        self.tags.base_config_file = None               # base config file in hyperparam sweep
+        self.tags.hp_keys = []                          # relevant keys (swept) in hyperparam sweep
+        self.tags.hp_values = []                        # values corresponding to keys in hyperparam sweep
     
     @property
     def use_goals(self):
