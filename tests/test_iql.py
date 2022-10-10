@@ -1,6 +1,6 @@
 """
 Test script for IQL algorithms. Each test trains a variant of IQL
-for a handful of gradient steps and tries one rollout with 
+for a handful of gradient steps and tries one rollout with
 the model. Excludes stdout output by default (pass --verbose
 to see stdout output).
 """
@@ -22,7 +22,7 @@ def get_algo_base_config():
     # config with basic settings for quick training run
     config = TestUtils.get_base_config(algo_name="iql")
 
-    # low-level obs (note that we define it here because @observation structure might vary per algorithm, 
+    # low-level obs (note that we define it here because @observation structure might vary per algorithm,
     # for example HBC)
     config.observation.modalities.obs.low_dim = ["robot0_eef_pos", "robot0_eef_quat", "robot0_gripper_qpos", "object"]
     config.observation.modalities.obs.rgb = []
