@@ -16,7 +16,7 @@ class ConfigGenerator(object):
     Useful class to keep track of hyperparameters to sweep, and to generate
     the json configs for each experiment run.
     """
-    def __init__(self, base_config_file, base_exp_name=None, wandb_proj_name=None, script_file=None, generated_config_dir=None):
+    def __init__(self, base_config_file, script_file, wandb_proj_name="debug"):
         """
         Args:
             base_config_file (str): path to a base json config to use as a starting point
@@ -42,7 +42,7 @@ class ConfigGenerator(object):
         self.base_exp_name = base_exp_name
         self.parameters = OrderedDict()
 
-        assert (wandb_proj_name is None) or isinstance(wandb_proj_name, str)
+        assert isinstance(wandb_proj_name, str)
         self.wandb_proj_name = wandb_proj_name
 
     def add_param(self, key, name, group, values, value_names=None):
@@ -252,18 +252,17 @@ class ConfigGenerator(object):
             for k in parameter_ranges:
                 set_value_for_key(json_dict, k, v=parameter_ranges[k][i])
 
-            # populate list of identifying meta for logger;
-            # see meta_config method in base_config.py for more info
-            if self.wandb_proj_name is not None:
-                json_dict["experiment"]["logging"]["wandb_proj_name"] = self.wandb_proj_name
-            if "meta" not in json_dict:
-                json_dict["meta"] = dict()
-            json_dict["meta"].update(
+            # populate list of identifying tags for logger;
+            # see tag_config method in base_config.py for more info
+            json_dict["experiment"]["logging"]["wandb_proj_name"] = self.wandb_proj_name
+            if "tags" not in json_dict:
+                json_dict["tags"] = dict()
+            json_dict["tags"].update(
                 hp_base_config_file=self.base_config_file,
                 hp_keys=list(),
                 hp_values=list(),
             )
-            # logging: keep track of hyp param names and values as meta info
+            # logging: keep track of hyp param names and values as tags
             for k in parameter_ranges.keys():
                 key_name = self.parameters[k].name
                 if key_name is not None and len(key_name) > 0:
@@ -272,8 +271,8 @@ class ConfigGenerator(object):
                     else:
                         value_name = setting[k]
             
-                    json_dict["meta"]["hp_keys"].append(key_name)
-                    json_dict["meta"]["hp_values"].append(value_name)
+                    json_dict['tags']['hp_keys'].append(key_name)
+                    json_dict['tags']['hp_values'].append(value_name)
 
             # save file in same directory as old json
             json_path = os.path.join(base_dir, "{}.json".format(exp_name))
