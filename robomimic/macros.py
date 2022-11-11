@@ -15,10 +15,6 @@ WANDB_ENTITY = None
 # alternatively, set up wandb from terminal with `wandb login`
 WANDB_API_KEY = None
 
-# wandb api key (obtain from https://wandb.ai/authorize)
-# alternatively, set up wandb from terminal with `wandb login`
-WANDB_API_KEY = None
-
 try:
     from robomimic.macros_private import *
 except ImportError:

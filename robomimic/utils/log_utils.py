@@ -63,6 +63,10 @@ class DataLogger(object):
             if Macros.WANDB_API_KEY is not None:
                 os.environ["WANDB_API_KEY"] = Macros.WANDB_API_KEY
 
+            assert Macros.WANDB_ENTITY is not None, "WANDB_ENTITY macro is set to None." \
+                    "\nSet this macro in {base_path}/macros_private.py" \
+                    "\nIf this file does not exist, first run {base_path}/scripts/setup_macros.py".format(base_path=robomimic.__path__[0])
+            
             # attempt to set up wandb 10 times. If unsuccessful after these trials, don't use wandb
             num_attempts = 10
             for attempt in range(num_attempts):
