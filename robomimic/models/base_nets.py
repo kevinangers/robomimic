@@ -14,6 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 from torchvision import models as vision_models
+from torchvision import transforms
 
 import robomimic.utils.tensor_utils as TensorUtils
 import robomimic.utils.obs_utils as ObsUtils
@@ -25,6 +26,16 @@ CONV_ACTIVATIONS = {
     None: None,
 }
 
+class FixableSequential(torch.nn.Sequential):
+    def __init__(self, fixed, *args, **kwargs):
+        torch.nn.Sequential.__init__(self, *args, **kwargs)
+        self.fixed = fixed
+
+    def train(self, mode):
+        if self.fixed:
+            super().train(False)
+        else:
+            super().train(mode)
 
 def rnn_args_from_config(rnn_config):
     """
@@ -635,7 +646,6 @@ class R3MConv(ConvBase):
         header = '{}'.format(str(self.__class__.__name__))
         return header + '(input_channel={}, input_coord_conv={}, pretrained={}, freeze={})'.format(self._input_channel, self._input_coord_conv, self._pretrained, self._freeze)
 
-
 class MVPConv(ConvBase):
     """
     Base class for ConvNets pretrained with MVP (https://arxiv.org/abs/2203.06173)
@@ -717,6 +727,10 @@ class MVPConv(ConvBase):
         return header + '(input_channel={}, input_coord_conv={}, pretrained={}, freeze={})'.format(self._input_channel, self._input_coord_conv, self._pretrained, self._freeze)
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1f82482 (adding r3m and mvp pretraining)
 class CoordConv2d(nn.Conv2d, Module):
     """
     2D Coordinate Convolution
