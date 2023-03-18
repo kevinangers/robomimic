@@ -16,7 +16,7 @@ class ConfigGenerator(object):
     Useful class to keep track of hyperparameters to sweep, and to generate
     the json configs for each experiment run.
     """
-    def __init__(self, base_config_file, script_file, wandb_proj_name="debug"):
+    def __init__(self, base_config_file, wandb_proj_name="debug", script_file=None, generated_config_dir=None):
         """
         Args:
             base_config_file (str): path to a base json config to use as a starting point
