@@ -26,16 +26,6 @@ CONV_ACTIVATIONS = {
     None: None,
 }
 
-class FixableSequential(torch.nn.Sequential):
-    def __init__(self, fixed, *args, **kwargs):
-        torch.nn.Sequential.__init__(self, *args, **kwargs)
-        self.fixed = fixed
-
-    def train(self, mode):
-        if self.fixed:
-            super().train(False)
-        else:
-            super().train(mode)
 
 def rnn_args_from_config(rnn_config):
     """
@@ -113,7 +103,10 @@ class Sequential(torch.nn.Sequential, Module):
                 assert isinstance(arg, nn.Module)
         torch.nn.Sequential.__init__(self, *args)
         self.fixed = False
+<<<<<<< HEAD
         self.has_output_shape = has_output_shape
+=======
+>>>>>>> a9f93b1 (fix)
 
     def output_shape(self, input_shape=None):
         """
@@ -611,7 +604,11 @@ class R3MConv(ConvBase):
             transforms.CenterCrop(224),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         )
+<<<<<<< HEAD
         self.nets = Sequential(*([preprocess] + list(net.module.convnet.children())), has_output_shape = False)
+=======
+        self.nets = Sequential(*([preprocess] + list(net.module.convnet.children())))
+>>>>>>> a9f93b1 (fix)
         if freeze:
             self.nets.freeze()
 

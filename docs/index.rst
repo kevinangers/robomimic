@@ -45,7 +45,7 @@ Welcome to robomimic's documentation!
    tutorials/training_transformers
    tutorials/using_pretrained_models
    tutorials/observations
-   tutorials/pretrained_representations
+   tutorials/pretrain_representations
    tutorials/custom_algorithms
    tutorials/tensor_collections
 
