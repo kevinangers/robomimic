@@ -103,10 +103,7 @@ class Sequential(torch.nn.Sequential, Module):
                 assert isinstance(arg, nn.Module)
         torch.nn.Sequential.__init__(self, *args)
         self.fixed = False
-<<<<<<< HEAD
         self.has_output_shape = has_output_shape
-=======
->>>>>>> a9f93b1 (fix)
 
     def output_shape(self, input_shape=None):
         """
@@ -604,11 +601,7 @@ class R3MConv(ConvBase):
             transforms.CenterCrop(224),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         )
-<<<<<<< HEAD
         self.nets = Sequential(*([preprocess] + list(net.module.convnet.children())), has_output_shape = False)
-=======
-        self.nets = Sequential(*([preprocess] + list(net.module.convnet.children())))
->>>>>>> a9f93b1 (fix)
         if freeze:
             self.nets.freeze()
 
@@ -642,6 +635,7 @@ class R3MConv(ConvBase):
         """Pretty print network."""
         header = '{}'.format(str(self.__class__.__name__))
         return header + '(input_channel={}, input_coord_conv={}, pretrained={}, freeze={})'.format(self._input_channel, self._input_coord_conv, self._pretrained, self._freeze)
+
 
 class MVPConv(ConvBase):
     """
@@ -725,9 +719,12 @@ class MVPConv(ConvBase):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 1f82482 (adding r3m and mvp pretraining)
+=======
+>>>>>>> c25514d (fix minor issues)
 class CoordConv2d(nn.Conv2d, Module):
     """
     2D Coordinate Convolution
