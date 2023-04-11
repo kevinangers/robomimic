@@ -1412,6 +1412,7 @@ class ScanCore(EncoderCore, ConvBase):
         msg += textwrap.indent("\npool_net={}".format(self.pool), indent)
         msg = header + '(' + msg + '\n)'
         return msg
+<<<<<<< HEAD
 
 
 
@@ -1933,3 +1934,5 @@ class GaussianNoiseRandomizer(Randomizer):
         return msg
 
 >>>>>>> e028be5 (add gaussian noise randomizer)
+=======
+>>>>>>> 0053042 (move randomizers to obs_core.py)

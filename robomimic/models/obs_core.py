@@ -356,7 +356,7 @@ class Randomizer(BaseNets.Module):
 
         Args:
             input_shape (iterable of int): shape of input. Does not include batch dimension.
-                Some modules may not need this argument, if their output does not depend 
+                Some modules may not need this argument, if their output does not depend
                 on the size of the input, or if they assume fixed size input.
 
         Returns:
@@ -373,7 +373,7 @@ class Randomizer(BaseNets.Module):
 
         Args:
             input_shape (iterable of int): shape of input. Does not include batch dimension.
-                Some modules may not need this argument, if their output does not depend 
+                Some modules may not need this argument, if their output does not depend
                 on the size of the input, or if they assume fixed size input.
 
         Returns:
@@ -688,6 +688,7 @@ class ColorRandomizer(Randomizer):
         if len(inputs.shape) == 3:
             inputs = torch.unsqueeze(inputs, dim=0)
 
+        # TODO: Make more efficient other than implicit for-loop?
         # Create lambda to aggregate all color randomizings at once
         transform = self.get_batch_transform(N=self.num_samples)
 
@@ -779,7 +780,7 @@ class GaussianNoiseRandomizer(Randomizer):
         out = TensorUtils.repeat_by_expand_at(inputs, repeats=self.num_samples, dim=0)
 
         # Sample noise across all samples
-        out = torch.rand(size=out.shape).to(inputs.device) * self.noise_std + self.noise_mean + out
+        out = torch.rand(size=out.shape) * self.noise_std + self.noise_mean + out
 
         # Possibly clamp
         if self.limits is not None:
