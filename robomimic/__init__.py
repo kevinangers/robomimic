@@ -81,6 +81,13 @@ def register_all_links():
                 task,
             )
         )
+        # real world datasets only have demo.hdf5 files which already contain all observation modalities
+        # while sim datasets store raw low-dim mujoco states in the demo.hdf5
+        if "real" not in task:
+            register_dataset_link(task=task, dataset_type="ph", hdf5_type="low_dim", horizon=horizon,
+                link=None)
+            register_dataset_link(task=task, dataset_type="ph", hdf5_type="image", horizon=horizon,
+                link=None)
 
     # all multi human datasets
     mh_tasks = ["lift", "can", "square", "transport"]
