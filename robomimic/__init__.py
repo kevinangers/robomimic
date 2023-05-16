@@ -85,7 +85,7 @@ def register_all_links():
         # while sim datasets store raw low-dim mujoco states in the demo.hdf5
         if "real" not in task:
             register_dataset_link(task=task, dataset_type="ph", hdf5_type="low_dim", horizon=horizon,
-                link=None)
+                link="http://downloads.cs.stanford.edu/downloads/rt_benchmark/{}/ph/low_dim_v141.hdf5".format(task))
             register_dataset_link(task=task, dataset_type="ph", hdf5_type="image", horizon=horizon,
                 link=None)
 
@@ -107,11 +107,11 @@ def register_all_links():
         register_dataset_link(task=task, dataset_type="mg", hdf5_type="low_dim_sparse", horizon=horizon,
             link="v1.5/{}/mg/low_dim_sparse_v15.hdf5".format(task))
         register_dataset_link(task=task, dataset_type="mg", hdf5_type="image_sparse", horizon=horizon,
-            link=None)
+            link="http://downloads.cs.stanford.edu/downloads/rt_benchmark/{}/mg/image_sparse_v141.hdf5".format(task))
         register_dataset_link(task=task, dataset_type="mg", hdf5_type="low_dim_dense", horizon=horizon,
             link="v1.5/{}/mg/low_dim_dense_v15.hdf5".format(task))
         register_dataset_link(task=task, dataset_type="mg", hdf5_type="image_dense", horizon=horizon,
-            link=None)
+            link="http://downloads.cs.stanford.edu/downloads/rt_benchmark/{}/mg/image_dense_v141.hdf5".format(task))
 
     # can-paired dataset
     register_dataset_link(task="can", dataset_type="paired", hdf5_type="raw", horizon=400,
