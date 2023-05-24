@@ -16,7 +16,7 @@ class ConfigGenerator(object):
     Useful class to keep track of hyperparameters to sweep, and to generate
     the json configs for each experiment run.
     """
-    def __init__(self, base_config_file, script_file, wandb_proj_name="debug"):
+    def __init__(self, base_config_file, wandb_proj_name="debug", script_file=None, generated_config_dir=None):
         """
         Args:
             base_config_file (str): path to a base json config to use as a starting point
@@ -204,10 +204,15 @@ class ConfigGenerator(object):
         """
 
         # base directory for saving jsons
-        base_dir = os.path.abspath(os.path.dirname(self.base_config_file))
+        if self.generated_config_dir:
+            base_dir = self.generated_config_dir
+            if not os.path.exists(base_dir):
+                os.makedirs(base_dir)
+        else:
+            base_dir = os.path.abspath(os.path.dirname(self.base_config_file))
 
         # read base json
-        base_config = load_json(self.base_config_file)
+        base_config = load_json(self.base_config_file, verbose=False)
 
         # base exp name from this base config
         if self.base_exp_name is not None:
@@ -274,6 +279,8 @@ class ConfigGenerator(object):
             save_json(json_dict, json_path)
             json_paths.append(json_path)
 
+        print("Num exps:", len(json_paths))
+
         return json_paths
 
     def _script_from_jsons(self, json_paths):
@@ -286,6 +293,9 @@ class ConfigGenerator(object):
             for path in json_paths:
                 # write python command to file
                 cmd = "python train.py --config {}\n".format(path)
+                
+                print()
+                print(cmd)
                 f.write(cmd)
 
 

@@ -152,7 +152,7 @@ def dataset_factory(config, obs_keys, filter_by_attribute=None, dataset_path=Non
         obs_keys=obs_keys,
         dataset_keys=config.train.dataset_keys,
         load_next_obs=config.train.hdf5_load_next_obs, # whether to load next observations (s') from dataset
-        frame_stack=1, # no frame stacking
+        frame_stack=config.train.frame_stack,
         seq_length=config.train.seq_length,
         pad_frame_stack=config.train.pad_frame_stack,
         pad_seq_length=config.train.pad_seq_length,
