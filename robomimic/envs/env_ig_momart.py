@@ -39,7 +39,7 @@ class EnvGibsonMOMART(EB.EnvBase):
             render=False,
             render_offscreen=False,
             use_image_obs=False,
-            use_depth_obs=False,
+            use_depth_obs=False, 
             image_height=None,
             image_width=None,
             physics_timestep=1./240.,
@@ -339,7 +339,7 @@ class EnvGibsonMOMART(EB.EnvBase):
             render=None, 
             render_offscreen=None, 
             use_image_obs=None, 
-            use_depth_obs=None, 
+            use_depth_obs=None,
             **kwargs,
     ):
         """

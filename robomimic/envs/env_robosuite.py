@@ -28,6 +28,11 @@ except ImportError:
 import robomimic.utils.obs_utils as ObsUtils
 import robomimic.envs.env_base as EB
 
+try:
+    import mimicgen
+except ImportError:
+    print("WARNING: could not import mimicgen robosuite envs")
+
 # protect against missing mujoco-py module, since robosuite might be using mujoco-py or DM backend
 try:
     import mujoco_py
@@ -95,12 +100,17 @@ class EnvRobosuite(EB.EnvBase):
 
         if self._is_v1:
             if kwargs["has_offscreen_renderer"]:
-                # ensure that we select the correct GPU device for rendering by testing for EGL rendering
-                # NOTE: this package should be installed from this link (https://github.com/StanfordVL/egl_probe)
-                import egl_probe
-                valid_gpu_devices = egl_probe.get_available_devices()
-                if len(valid_gpu_devices) > 0:
-                    kwargs["render_gpu_device_id"] = valid_gpu_devices[0]
+                cuda_visible_device = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+                if cuda_visible_device.isnumeric():
+                    # assume that user specified a specific GPU ID
+                    kwargs["render_gpu_device_id"] = int(cuda_visible_device)
+                else:
+                    # ensure that we select the correct GPU device for rendering by testing for EGL rendering
+                    # NOTE: this package should be installed from this link (https://github.com/StanfordVL/egl_probe)
+                    import egl_probe
+                    valid_gpu_devices = egl_probe.get_available_devices()
+                    if len(valid_gpu_devices) > 0:
+                        kwargs["render_gpu_device_id"] = valid_gpu_devices[0]
         else:
             # make sure gripper visualization is turned off (we almost always want this for learning)
             kwargs["gripper_visualization"] = False
@@ -219,11 +229,10 @@ class EnvRobosuite(EB.EnvBase):
             self.env.viewer.set_camera(cam_id)
             return self.env.render()
         elif mode == "rgb_array":
-            im = self.env.sim.render(height=height, width=width, camera_name=camera_name)
-            # if self.use_depth_obs:
-            #     # render() returns a tuple when self.use_depth_obs=True
-            #     return im[0][::-1]
-            return im[::-1]
+            im = self.env.sim.render(height=height, width=width, camera_name=camera_name)[::-1]
+            if self.use_depth_obs:
+                return im[0]
+            return im
         else:
             raise NotImplementedError("mode={} is not implemented".format(mode))
 
@@ -475,12 +484,10 @@ class EnvRobosuite(EB.EnvBase):
             camera_height (int): camera height for all cameras
             camera_width (int): camera width for all cameras
             reward_shaping (bool): if True, use shaped environment rewards, else use sparse task completion rewards
-            render (bool or None): optionally override rendering behavior. Defaults to False.
-            render_offscreen (bool or None): optionally override rendering behavior. The default value is True if
-                @camera_names is non-empty, False otherwise.
-            use_image_obs (bool or None): optionally override rendering behavior. The default value is True if
-                @camera_names is non-empty, False otherwise.
-            use_depth_obs (bool): if True, use depth observations
+            render (bool or None): optionally override rendering behavior
+            render_offscreen (bool or None): optionally override rendering behavior
+            use_image_obs (bool or None): optionally override rendering behavior
+            use_depth_obs (bool or None): optionally override rendering behavior
         """
         is_v1 = (robosuite.__version__.split(".")[0] == "1")
         has_camera = (len(camera_names) > 0)
@@ -510,7 +517,7 @@ class EnvRobosuite(EB.EnvBase):
             image_modalities = ["{}_image".format(cn) for cn in camera_names]
             depth_modalities = ["{}_depth".format(cn) for cn in camera_names]
         elif has_camera:
-            # v0.3 only had support for one image, and it was named "rgb"
+            # v0.3 only had support for one image, and it was named "image"
             assert len(image_modalities) == 1
             image_modalities = ["image"]
             depth_modalities = ["depth"]

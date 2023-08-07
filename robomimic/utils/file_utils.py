@@ -104,7 +104,7 @@ def get_env_metadata_from_dataset(dataset_path, ds_format="robomimic", set_env_s
             :`'type'`: type of environment, should be a value in EB.EnvType
             :`'env_kwargs'`: dictionary of keyword arguments to pass to environment constructor
     """
-    dataset_path = os.path.expanduser(dataset_path)
+    dataset_path = os.path.expandvars(os.path.expanduser(dataset_path))
     f = h5py.File(dataset_path, "r")
     if ds_format == "robomimic":
         env_meta = json.loads(f["data"].attrs["env_args"])
@@ -143,7 +143,7 @@ def get_shape_metadata_from_dataset(dataset_path, action_keys, all_obs_keys=None
     shape_meta = {}
 
     # read demo file for some metadata
-    dataset_path = os.path.expanduser(dataset_path)
+    dataset_path = os.path.expandvars(os.path.expanduser(dataset_path))
     f = h5py.File(dataset_path, "r")
     
     if ds_format == "robomimic":
@@ -220,7 +220,7 @@ def load_dict_from_checkpoint(ckpt_path):
     Returns:
         ckpt_dict (dict): Loaded checkpoint dictionary.
     """
-    ckpt_path = os.path.expanduser(ckpt_path)
+    ckpt_path = os.path.expandvars(os.path.expanduser(ckpt_path))
     if not torch.cuda.is_available():
         ckpt_dict = torch.load(ckpt_path, map_location=lambda storage, loc: storage)
     else:
@@ -503,8 +503,8 @@ def env_from_checkpoint(ckpt_path=None, ckpt_dict=None, env_name=None, render=Fa
         env_name=env_name, 
         render=render, 
         render_offscreen=render_offscreen,
-        use_image_obs=shape_meta.get("use_images", False),
-        use_depth_obs=shape_meta.get("use_depths", False),
+        use_image_obs=shape_meta["use_images"],
+        use_depth_obs=shape_meta["use_depths"],
     )
     config, _ = config_from_checkpoint(algo_name=ckpt_dict["algo_name"], ckpt_dict=ckpt_dict, verbose=False)
     env = EnvUtils.wrap_env_from_config(env, config=config) # apply environment wrapper, if applicable
@@ -577,29 +577,19 @@ def download_url(url, download_dir, check_overwrite=True):
         urllib.request.urlretrieve(url, filename=file_to_write, reporthook=t.update_to)
 
 
-def download_file_from_hf(repo_id, filename, download_dir, check_overwrite=True):
+def find_and_replace_path_prefix(org_path, replace_prefixes, new_prefix, assert_replace=False):
     """
-    Downloads a file from Hugging Face.
-    Reference: https://huggingface.co/docs/huggingface_hub/main/en/guides/download
-    Example usage:
-        repo_id = "amandlek/mimicgen_datasets"
-        filename = "core/coffee_d0.hdf5"
-        download_dir = "/tmp"
-        download_file_from_hf(repo_id, filename, download_dir, check_overwrite=True)
-    Args:
-        repo_id (str): Hugging Face repo ID
-        filename (str): path to file in repo
-        download_dir (str): path to directory where file should be downloaded
-        check_overwrite (bool): if True, will sanity check the download fpath to make sure a file of that name
-            doesn't already exist there
+    Try to find and replace one of several prefixes (@replace_prefixes) in string @org_path
+    with another prefix (@new_prefix). If @assert_replace is True, the function asserts that
+    replacement did occur.
     """
-    with tempfile.TemporaryDirectory() as td:
-        # first check if file exists
-        file_to_write = os.path.join(download_dir, os.path.basename(filename))
-        if check_overwrite and os.path.exists(file_to_write):
-            user_response = input(f"Warning: file {file_to_write} already exists. Overwrite? y/n\n")
-            assert user_response.lower() in {"yes", "y"}, f"Did not receive confirmation. Aborting download."
-
-        # note: fpath is a pointer, so we need to look up the actual path on disk and then move it
-        fpath = hf_hub_download(repo_id=repo_id, filename=filename, repo_type="dataset", cache_dir=td)
-        shutil.move(os.path.realpath(fpath), file_to_write)
+    check_ind = -1
+    for i, x in enumerate(replace_prefixes):
+        if org_path.startswith(x):
+            check_ind = i
+    if assert_replace:
+        assert check_ind != -1
+    if check_ind == -1:
+        return org_path
+    replace_prefix = replace_prefixes[check_ind]
+    return org_path.replace(replace_prefix, new_prefix, 1)
